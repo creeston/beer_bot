@@ -13,7 +13,6 @@ def send_reply(response):
     if 'text' in response:
         api.post(URL + "sendMessage", data=response)
 
-CMD = {"/help": help_message}
 
 def not_found(arguments, message):
     response = {'chat_id': message['chat']['id']}
@@ -27,6 +26,8 @@ def help_message(arguments, message):
         result.append(command)
     response['text'] = "\n\t".join(result)
     return response
+
+CMD = {"/help": help_message}
  
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
