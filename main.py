@@ -35,7 +35,7 @@ def create_beer_message(arguments, message):
                 rep.remove(chat_id)
                 date = datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
                 date = date.replace(year = datetime.now().year)
-                local_delta = timedelta(hour=3)
+                local_delta = timedelta(hours=3)
                 date = date - local_delta
                 rep.create("Beer", arguments[0], date, chat_id)
                 response['text'] = 'Beer created successfully'
