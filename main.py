@@ -34,12 +34,13 @@ def help_message(arguments, message):
     return response
 
 def create_beer_message(arguments, message):
+    response = {'chat_id': message['chat']['id']}
     try:
         with EventRepository() as rep:
             rep.create("Beer", arguments[0], datetime.datetime(arguments[1]), message['chat']['id'])
     except Exception as e:
         response['text'] = str(e)
-        return response
+        return response 
     response['text'] = 'Beer created successfully'
     return response
 
