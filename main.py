@@ -90,6 +90,7 @@ class HookHandler(tornado.web.RequestHandler):
                 print("MESSAGE\t%s\t%s" % (message['chat']['id'], text))
                 if text[0] == '/':
                     command, *arguments = text.split(" ")
+                    сommand = command.split("@")[0]
                     response = CMD.get(command, not_found)(arguments, message)
                     print("REPLY\t%s\t%s" % (message['chat']['id'], response))
                     send_reply(response)
