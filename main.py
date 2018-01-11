@@ -39,10 +39,10 @@ def create_beer_message(arguments, message):
     response = {'chat_id': message['chat']['id']}
     try:
         with EventRepository() as rep:
-            if len(arguments) == 0:
+            if len(arguments) != 3:
                 response['text'] = 'USAGE: /create [place] d.m H:M'
             else:
-                date = datetime.datetime.strptime(arguments[1], "%d.%m %H:%M")
+                date = datetime.datetime.strptime("%s %s" % arguments[1:], "%d.%m %H:%M")
                 date = date.replace(year = datetime.datetime.now().year)
                 rep.create("Beer", arguments[0], date, message['chat']['id'])
                 response['text'] = 'Beer created successfully'
