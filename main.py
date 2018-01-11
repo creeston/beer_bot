@@ -6,7 +6,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.escape
 import requests
-import datetime
+from datetime import datetime, timedelta
 from repository import EventRepository
 
 
@@ -33,8 +33,10 @@ def create_beer_message(arguments, message):
                 response['text'] = 'USAGE: /create [place(without spaces)] d.m H:M'
             else:
                 rep.remove(chat_id)
-                date = datetime.datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
-                date = date.replace(year = datetime.datetime.now().year)
+                date = datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
+                date = date.replace(year = datetime.now().year)
+                local_delta = timedelta(hour=3)
+                date = date - local_delta
                 rep.create("Beer", arguments[0], date, chat_id)
                 response['text'] = 'Beer created successfully'
     except Exception as e:
@@ -60,7 +62,7 @@ def when_beer_message(arguments, message):
                 response['text'] = u'Нет пива в ближайшее время'
             else:
                 event = events[0]
-                response['text'] = u'Пиво будет в %s %s (через %s часов)' % (event.place, event.date.strftime("%d.%m %H:%M"), (event.date - datetime.datetime.now()).seconds / 3600)
+                response['text'] = u'Пиво будет в %s %s (через %.2f часов)' % (event.place, event.date.strftime("%d.%m %H:%M"), (event.date - datetime.utcnow()).seconds / 3600)
     except Exception as e:
         response['text'] = str(e)
         return response
