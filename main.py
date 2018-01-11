@@ -34,14 +34,20 @@ def help_message(arguments, message):
     return response
 
 def create_beer_message(arguments, message):
+    print("arguments")
+    print(arguments)
     response = {'chat_id': message['chat']['id']}
     try:
         with EventRepository() as rep:
-            rep.create("Beer", arguments[0], datetime.datetime(arguments[1]), message['chat']['id'])
+            if len(arguments) == 0:
+                response['text'] = 'USAGE: /create [place] d.m H:M'
+            else:
+                date = datetime.datetime.strptime(arguments[1], "%d.%m %H:%M")
+                date = date.replace(year = datetime.datetime.now().year)
+                rep.create("Beer", arguments[0], date, message['chat']['id'])
+                response['text'] = 'Beer created successfully'
     except Exception as e:
         response['text'] = str(e)
-        return response 
-    response['text'] = 'Beer created successfully'
     return response
 
 def when_beer_message(arguments, message):
@@ -77,7 +83,7 @@ class HookHandler(tornado.web.RequestHandler):
             if text:
                 print("MESSAGE\t%s\t%s" % (message['chat']['id'], text))
                 if text[0] == '/':
-                    command, *arguments = text.split(" ", 1)
+                    command, *arguments = text.split(" ")
                     response = CMD.get(command, not_found)(arguments, message)
                     print("REPLY\t%s\t%s" % (message['chat']['id'], response))
                     send_reply(response)

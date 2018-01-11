@@ -22,4 +22,8 @@ class EventRepository(object):
 
 	def list(self, chat_id):
 		return list(self.session.query(Event).filter(Event.chat_id==chat_id))
+
+	def delete(self, chat_id):
+		self.session.query(Event).filter(Event.chat_id==chat_id).delete()
+		self.session.commit()
 		
