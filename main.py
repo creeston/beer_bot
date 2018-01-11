@@ -34,8 +34,6 @@ def help_message(arguments, message):
     return response
 
 def create_beer_message(arguments, message):
-    print("arguments")
-    print(arguments)
     response = {'chat_id': message['chat']['id']}
     try:
         with EventRepository() as rep:
@@ -50,6 +48,16 @@ def create_beer_message(arguments, message):
         response['text'] = str(e)
     return response
 
+def remove_message(arguments, message):
+    response = {'chat_id': message['chat']['id']}
+    try:
+        with EventRepository() as rep:
+            rep.remove(message['chat']['id'])
+            response['text'] = 'Beer removed successfully'
+    except Exception as e:
+        response['text'] = str(e)
+    return response    
+
 def when_beer_message(arguments, message):
     response = {'chat_id': message['chat']['id']}
     try:
@@ -59,7 +67,7 @@ def when_beer_message(arguments, message):
                 response['text'] = u'Нет пива в ближайшее время'
             else:
                 event = events[0]
-                response['text'] = u'Пиво будет в %s %s' % (event.place, str(event.date))
+                response['text'] = u'Пиво будет в %s %s (через %s часов)' % (event.place, event.date.strftime("%d.%m %H:%M"), (event.date - datetime.datetime.now()).seconds / 3600)
     except Exception as e:
         response['text'] = str(e)
         return response
