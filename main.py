@@ -9,6 +9,7 @@ import requests
 from datetime import datetime, timedelta
 from repository import EventRepository
 
+local_delta = timedelta(hours=3)
 
 URL = "https://api.telegram.org/bot%s/" % os.environ['BOT_TOKEN']
 MyURL = "https://vast-depths-79763.herokuapp.com/hook"
@@ -35,7 +36,6 @@ def create_beer_message(arguments, message):
                 rep.remove(chat_id)
                 date = datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
                 date = date.replace(year = datetime.now().year)
-                local_delta = timedelta(hours=3)
                 date = date - local_delta
                 rep.create("Beer", arguments[0], date, chat_id)
                 response['text'] = 'Beer created successfully'
@@ -62,7 +62,10 @@ def when_beer_message(arguments, message):
                 response['text'] = u'Нет пива в ближайшее время'
             else:
                 event = events[0]
-                response['text'] = u'Пиво будет в %s %s (через %.2f часов)' % (event.place, event.date.strftime("%d.%m %H:%M"), (event.date - datetime.utcnow()).seconds / 3600)
+                response['text'] = u'Пиво будет в %s %s (через %.2f часов)' % (
+                    event.place, 
+                    (event.date + local_delta).strftime("%d.%m %H:%M"), 
+                    (event.date - datetime.utcnow()).total_seconds() / 3600)
     except Exception as e:
         response['text'] = str(e)
         return response
