@@ -1,9 +1,14 @@
 import os
 import tornado.httpserver
+# -*- coding: utf-8 -*- 
+
 import tornado.ioloop
 import tornado.web
 import tornado.escape
 import requests
+import datetime
+from repository import EventRepository
+
 
 URL = "https://api.telegram.org/bot%s/" % os.environ['BOT_TOKEN']
 MyURL = "https://vast-depths-79763.herokuapp.com/hook"
@@ -17,6 +22,7 @@ def send_reply(response):
 def not_found(arguments, message):
     response = {'chat_id': message['chat']['id']}
     response['text'] = "Command not found"
+    return response
 
 def help_message(arguments, message):
     response = {'chat_id': message['chat']['id']}
@@ -27,7 +33,33 @@ def help_message(arguments, message):
     response['text'] = "\n\t".join(result)
     return response
 
-CMD = {"/help": help_message}
+def create_beer_message(arguments, message):
+    try:
+        with EventRepository() as rep:
+            rep.create("Beer", arguments[0], datetime.datetime(arguments[1]), message['chat']['id'])
+    except Exception as e:
+        response['text'] = str(e)
+        return response
+    response['text'] = 'Beer created successfully'
+    return response
+
+def when_beer_message(arguments, message):
+    response = {'chat_id': message['chat']['id']}
+    try:
+        with EventRepository() as rep:
+            events = rep.list(message['chat']['id'])
+            if not events:
+                response['text'] = u'Нет пива в ближайшее время'
+            else:
+                event = events[0]
+                response['text'] = u'Пиво будет в %s %s' % (event.place, str(event.date))
+    except Exception as e:
+        response['text'] = str(e)
+        return response
+    return response
+
+
+CMD = {"/help": help_message, '/create': create_beer_message, '/when': when_beer_message}
  
 class MainHandler(tornado.web.RequestHandler):
     def get(self):

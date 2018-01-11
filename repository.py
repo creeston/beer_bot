@@ -12,7 +12,7 @@ class EventRepository(object):
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		self.session.close()
 
-	def create(self, name, place, chat_id, date):
+	def create(self, name, place, date, chat_id):
 		event = Event(name=name, place=place, chat_id=chat_id, date=date)
 		self.session.add(event)
 		self.session.commit()
