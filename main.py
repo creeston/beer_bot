@@ -24,31 +24,24 @@ def not_found(arguments, message):
     response['text'] = "Command not found"
     return response
 
-def help_message(arguments, message):
-    response = {'chat_id': message['chat']['id']}
-    result = ["Hey, %s!" % message["from"].get("first_name"),
-              "\rI can accept only these commands:"]
-    for command in CMD:
-        result.append(command)
-    response['text'] = "\n\t".join(result)
-    return response
-
 def create_beer_message(arguments, message):
-    response = {'chat_id': message['chat']['id']}
+    chat_id = message['chat']['id']
+    response = {'chat_id': chat_id}
     try:
         with EventRepository() as rep:
             if len(arguments) != 3:
                 response['text'] = 'USAGE: /create [place(without spaces)] d.m H:M'
             else:
+                rep.remove(chat_id)
                 date = datetime.datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
                 date = date.replace(year = datetime.datetime.now().year)
-                rep.create("Beer", arguments[0], date, message['chat']['id'])
+                rep.create("Beer", arguments[0], date, chat_id)
                 response['text'] = 'Beer created successfully'
     except Exception as e:
         response['text'] = str(e)
     return response
 
-def remove_message(arguments, message):
+def remove_beer_message(arguments, message):
     response = {'chat_id': message['chat']['id']}
     try:
         with EventRepository() as rep:
@@ -74,7 +67,7 @@ def when_beer_message(arguments, message):
     return response
 
 
-CMD = {"/help": help_message, '/create': create_beer_message, '/when': when_beer_message}
+CMD = {"/remove": remove_beer_message, '/create': create_beer_message, '/when': when_beer_message}
  
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
