@@ -16,7 +16,7 @@ class BeerHandler(object):
             self.angry_reply = u"{0} определись сначала когда и куда вы там пойдете, лишний раз не надо меня дергать."
 
     def handle(self, chat_id):
-        if len(arguments) > 0:
+        if len(self.arguments) > 0:
             return self._process_create_request()
         else:
             return self._process_when_request()
