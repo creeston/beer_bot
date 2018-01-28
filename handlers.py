@@ -51,7 +51,7 @@ class BeerHandler(object):
         minute_string = self._get_minute_string(delta_minutes)
         if delta_minutes != 0 and delta_seconds != 0:
             delta = u"%d %s %d %s" % (delta_hours, hours_string, delta_minutes, minute_string)
-        else if delta_minutes == 0:
+        elif delta_minutes == 0:
             delta = u"%d %s" % (delta_hours, hours_string)
         else:
             delta = u"%d %s" % (delta_minutes, minute_string)
