@@ -25,7 +25,7 @@ class BeerHandler(object):
     def _process_create_request(self, chat_id):
         with EventRepository() as rep:
             place = self.arguments[0]
-            date = dateparser.parse(" ".join(self.arguments[1:]))
+            date = dateparser.parse(" ".join(self.arguments[1:]), languages=['ru', 'ru'])
             if not date:
                 return u"Ты ебанутый?)) Сначала укажи место(без пробелов), а потом дату в нормальном формате"
             rep.remove(chat_id)
@@ -47,11 +47,31 @@ class BeerHandler(object):
         delta_seconds = (event_date - datetime.utcnow()).total_seconds()
         delta_hours = int(delta_seconds / 3600)
         delta_minutes = int((delta_seconds - (delta_hours * 3600)) / 60)
-        if delta_minutes != 0:
-            delta = u"%d часов %d минут" % (delta_hours, delta_minutes)
+        hours_string = self._get_hours_string(delta_hours)
+        minute_string = self._get_minute_string(delta_minutes)
+        if delta_minutes != 0 and delta_seconds != 0:
+            delta = u"%d %s %d %s" % (delta_hours, hours_string, delta_minutes, minute_string)
+        else if delta_minutes == 0:
+            delta = u"%d %s" % (delta_hours, hours_string)
         else:
-            delta = u"%d часов" % (delta_hours)
+            delta = u"%d %s" % (delta_minutes, minute_string)
         return u"Пиво будет в %s %s (через %s) \U0001F37A" % (place, date, delta)
+
+    def _get_hours_string(self, hours):
+        if hours >= 5 and hours <= 20:
+            return u"часов"
+        else if hours % 10 == 1:
+            return u"час"
+        else:
+            return u"часа"
+
+    def _get_minute_string(self, minutes):
+        if minutes >= 5 and minutes <= 20:
+            return u"минут"
+        else if hours % 10 == 1:
+            return u"минуту"
+        else:
+            return u"минуты"
 
 
 class UnknownCommandHandler(object):
