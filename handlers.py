@@ -18,11 +18,11 @@ class BeerHandler(object):
 
     def handle(self, chat_id):
         if len(self.arguments) > 0:
-            return self._process_create_request()
+            return self._process_create_request(chat_id)
         else:
-            return self._process_when_request()
+            return self._process_when_request(chat_id)
 
-    def _process_create_request(self):
+    def _process_create_request(self, chat_id):
         with EventRepository() as rep:
             place = self.arguments[0]
             date = dateparser.parse(" ".join(self.arguments[1:]))
@@ -34,7 +34,7 @@ class BeerHandler(object):
             rep.create("Beer", place, date, chat_id)
         return self._get_beer_delay_string(place, date)
 
-    def _process_when_request(self):
+    def _process_when_request(self, chat_id):
         with EventRepository() as rep:
             events = rep.list(chat_id)
         if not events:
