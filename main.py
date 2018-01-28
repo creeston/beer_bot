@@ -38,6 +38,7 @@ def build_handlers():
     for name, obj in inspect.getmembers(handlers):
         if inspect.isclass(obj) and hasattr(obj, 'command'):
             cmd["/%s" % obj.command] = obj
+    return cmd
 
 
 CMD = build_handlers()
