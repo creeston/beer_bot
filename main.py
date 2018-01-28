@@ -23,7 +23,8 @@ def send_reply(response):
 
 
 def process_response(handler_class, arguments, message):
-    response = {'chat_id': message['chat']['id']}
+    chat_id = message['chat']['id']
+    response = {'chat_id': chat_id}
     try:
         handler = handler_class(arguments)
         response['text'] = handler.handle(chat_id)
