@@ -44,7 +44,7 @@ class BeerHandler(object):
 
     def _get_beer_delay_string(self, place, event_date):
         date = (event_date + self.local_delta).strftime("%d.%m %H:%M")
-        delta_seconds = (event_date - datetime.utcnow()).total_seconds
+        delta_seconds = (event_date - datetime.utcnow()).total_seconds()
         delta_hours = int(delta_seconds / 3600)
         delta_minutes = int(delta_seconds - (delta_hours * 3600) / 60)
         if delta_minutes != 0:
