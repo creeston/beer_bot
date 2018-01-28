@@ -36,9 +36,7 @@ def process_response(handler_class, arguments, message):
 def build_handlers():
     cmd = {}
     for name, obj in inspect.getmembers(handlers):
-        if inspect.isclass(obj):
-            if not obj.command:
-                continue
+        if inspect.isclass(obj) && hasattr(obj, 'command'):
             cmd["/%s" % obj.command] = obj
 
 
