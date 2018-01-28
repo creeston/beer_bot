@@ -60,7 +60,7 @@ class BeerHandler(object):
     def _get_hours_string(self, hours):
         if hours >= 5 and hours <= 20:
             return u"часов"
-        else if hours % 10 == 1:
+        elif hours % 10 == 1:
             return u"час"
         else:
             return u"часа"
@@ -68,7 +68,7 @@ class BeerHandler(object):
     def _get_minute_string(self, minutes):
         if minutes >= 5 and minutes <= 20:
             return u"минут"
-        else if hours % 10 == 1:
+        elif hours % 10 == 1:
             return u"минуту"
         else:
             return u"минуты"
