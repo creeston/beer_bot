@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- 
 import dateparser
 from datetime import timedelta, datetime
+from repository import EventRepository
 
 class BeerHandler(object):
     angry_threshold = 3

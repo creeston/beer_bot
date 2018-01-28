@@ -1,17 +1,13 @@
 import os
 import tornado.httpserver
-# -*- coding: utf-8 -*- 
-
 import tornado.ioloop
 import tornado.web
 import tornado.escape
 import requests
-from datetime import datetime, timedelta
-from repository import EventRepository
 import handlers
 import inspect
+# -*- coding: utf-8 -*- 
 
-local_delta = timedelta(hours=3)
 
 URL = "https://api.telegram.org/bot%s/" % os.environ['BOT_TOKEN']
 MyURL = "https://vast-depths-79763.herokuapp.com/hook"
