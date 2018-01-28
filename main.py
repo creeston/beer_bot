@@ -8,6 +8,8 @@ import tornado.escape
 import requests
 from datetime import datetime, timedelta
 from repository import EventRepository
+import handlers
+import inspect
 
 local_delta = timedelta(hours=3)
 
@@ -20,60 +22,29 @@ def send_reply(response):
         api.post(URL + "sendMessage", data=response)
 
 
-def not_found(arguments, message):
-    response = {'chat_id': message['chat']['id']}
-    response['text'] = "Command not found"
-    return response
-
-def create_beer_message(arguments, message):
-    chat_id = message['chat']['id']
-    response = {'chat_id': chat_id}
-    try:
-        with EventRepository() as rep:
-            if len(arguments) != 3:
-                response['text'] = 'USAGE: /create [place(without spaces)] d.m H:M'
-            else:
-                rep.remove(chat_id)
-                date = datetime.strptime("%s %s" % (arguments[1], arguments[2]), "%d.%m %H:%M")
-                date = date.replace(year = datetime.now().year)
-                date = date - local_delta
-                rep.create("Beer", arguments[0], date, chat_id)
-                response['text'] = 'Beer created successfully'
-    except Exception as e:
-        response['text'] = str(e)
-    return response
-
-def remove_beer_message(arguments, message):
+def process_response(handler_class, arguments, message):
     response = {'chat_id': message['chat']['id']}
     try:
-        with EventRepository() as rep:
-            rep.remove(message['chat']['id'])
-            response['text'] = 'Beer removed successfully'
-    except Exception as e:
-        response['text'] = str(e)
-    return response    
-
-def when_beer_message(arguments, message):
-    response = {'chat_id': message['chat']['id']}
-    try:
-        with EventRepository() as rep:
-            events = rep.list(message['chat']['id'])
-            if not events:
-                response['text'] = u'Нет пива в ближайшее время'
-            else:
-                event = events[0]
-                response['text'] = u'Пиво будет в %s %s (через %.2f часов)' % (
-                    event.place, 
-                    (event.date + local_delta).strftime("%d.%m %H:%M"), 
-                    (event.date - datetime.utcnow()).total_seconds() / 3600)
+        handler = handler_class(arguments)
+        response['text'] = handler.handle(chat_id)
     except Exception as e:
         response['text'] = str(e)
         return response
     return response
 
 
-CMD = {"/remove": remove_beer_message, '/create': create_beer_message, '/when': when_beer_message}
+def build_handlers():
+    cmd = {}
+    for name, obj in inspect.getmembers(handlers):
+        if inspect.isclass(obj)
+            if not obj.command:
+                continue
+            cmd["/%s" % obj.command] = obj
+
+
+CMD = build_handlers()
  
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("Hello world")
@@ -90,8 +61,9 @@ class HookHandler(tornado.web.RequestHandler):
                 print("MESSAGE\t%s\t%s" % (message['chat']['id'], text))
                 if text[0] == '/':
                     command, *arguments = text.split(" ")
-                    сommand = command.split("@")[0]
-                    response = CMD.get(command, not_found)(arguments, message)
+                    сommand = command.split(u"@")[0]
+                    handler = CMD.get(command, handles.UnknownCommandHandler)
+                    response = process_response(handler, arguments, message)
                     print("REPLY\t%s\t%s" % (message['chat']['id'], response))
                     send_reply(response)
         except Exception as e:
