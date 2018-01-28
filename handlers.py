@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*- 
 import dateparser
 
-def command_decorator(cls, command):
-    cls.command = command
-    return cls
-
-
-@command_decorator("beer")
 class BeerHandler(object):
-    local_delta = timedelta(hours=3)
     angry_threshold = 3
+    angry_reply = ""
+    command = "beer"
 
+    local_delta = timedelta(hours=3)
     def __init__(self, arguments):
         self.arguments = arguments
         if len(arguments) == 0:
