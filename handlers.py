@@ -62,16 +62,20 @@ class BeerHandler(object):
             return u"часов"
         elif hours % 10 == 1:
             return u"час"
-        else:
+        elif hours % 10 >= 2 and hours % 10 <= 4:
             return u"часа"
+        else:
+            return u"часов"
 
     def _get_minute_string(self, minutes):
         if minutes >= 5 and minutes <= 20:
             return u"минут"
         elif minutes % 10 == 1:
             return u"минуту"
-        else:
+        elif minutes % 10 >= 2 and minutes % 10 <= 4:
             return u"минуты"
+        else:
+            return u"минут"
 
 
 class UnknownCommandHandler(object):
